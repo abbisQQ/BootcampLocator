@@ -1,12 +1,18 @@
 package com.example.babis.bootcamplocator;
 
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -16,7 +22,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -60,6 +69,31 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
 
+
+        final EditText zipText = (EditText)view.findViewById(R.id.zip_text);
+
+        zipText.setOnKeyListener(new View.OnKeyListener() {
+            @Override
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+
+                if((event.getAction() == KeyEvent.ACTION_DOWN)&&keyCode == KeyEvent.KEYCODE_ENTER){
+                    String text = zipText.getText().toString();
+                    int zip = Integer.parseInt(text);
+
+                    //hiding the keyboard
+                    InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromInputMethod(zipText.getWindowToken(),0);
+
+
+                    updateMapForZip(zip);
+                }
+
+                return false;
+            }
+        });
+
+
+
         return view;
     }
 
@@ -86,6 +120,18 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
             userMarker = new MarkerOptions().position(latLng).title("Current Location");
             mMap.addMarker(userMarker);
         }
+
+
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation( latLng.latitude,latLng.longitude,1);
+            //removing the space in string .replaceAll("\\s+","")
+            int zip = Integer.parseInt(addresses.get(0).getPostalCode().replaceAll("\\s+",""));
+            updateMapForZip(zip);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         updateMapForZip(92284);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
     }

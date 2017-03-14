@@ -34,7 +34,8 @@
                     android:layout_weight="20"
                     android:layout_height="40dp"
                     android:hint="@string/hint_zip"
-                    android:inputType="number"/>
+                    android:inputType="number"
+                    android:id="@+id/zip_text"/>
                 <ImageButton
                     android:layout_weight="1"
                     android:layout_width="35dp"
