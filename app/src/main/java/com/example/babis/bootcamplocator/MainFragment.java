@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -38,6 +39,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
 
     private GoogleMap mMap;
     private MarkerOptions userMarker;
+    private  LocationListFragment listFragment;
 
 
     public MainFragment() {
@@ -70,6 +72,18 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
         mapFragment.getMapAsync(this);
 
 
+        listFragment = (LocationListFragment)getActivity().getSupportFragmentManager().findFragmentById(R.id.container_location_lists);
+        if(listFragment==null){
+            listFragment = LocationListFragment.newInstance();
+            getActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .add(R.id.container_location_lists,listFragment)
+                    .commit();
+        }
+
+
+
         final EditText zipText = (EditText)view.findViewById(R.id.zip_text);
 
         zipText.setOnKeyListener(new View.OnKeyListener() {
@@ -84,7 +98,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
                     InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromInputMethod(zipText.getWindowToken(),0);
 
-
+                    showList();
                     updateMapForZip(zip);
                 }
 
@@ -93,7 +107,7 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
         });
 
 
-
+        hideList();
         return view;
     }
 
@@ -130,11 +144,21 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
             updateMapForZip(zip);
         } catch (IOException e) {
             e.printStackTrace();
+            Toast.makeText(getContext(),"zip error",Toast.LENGTH_SHORT).show();
         }
 
         updateMapForZip(92284);
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
     }
+
+    private void hideList(){
+        getActivity().getSupportFragmentManager().beginTransaction().hide(listFragment).commit();
+    }
+
+    private void showList(){
+        getActivity().getSupportFragmentManager().beginTransaction().show(listFragment).commit();
+    }
+
 
 
     private void updateMapForZip(int zipcode){
@@ -154,6 +178,10 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
 
 
         }
+
+
+
+
 
 
     }

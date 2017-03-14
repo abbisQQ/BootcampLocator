@@ -6,6 +6,9 @@ package com.example.babis.bootcamplocator;
 
 public class Devslopes {
 
+    final String DRAWABLE = "drawable/";
+
+
     private float longitude;
     private float latitude;
     private String locationTitle,locationAddress,imageUrl;
@@ -17,7 +20,14 @@ public class Devslopes {
         this.locationTitle = locationTitle;
         this.locationAddress = locationAddress;
         this.imageUrl = imageUrl;
+
     }
+
+    public String getImageURL(){
+        return  DRAWABLE+imageUrl;
+    }
+
+
 
 
     public float getLongitude() {
