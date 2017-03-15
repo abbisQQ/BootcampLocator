@@ -92,14 +92,16 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
 
                 if((event.getAction() == KeyEvent.ACTION_DOWN)&&keyCode == KeyEvent.KEYCODE_ENTER){
                     String text = zipText.getText().toString();
-                    int zip = Integer.parseInt(text);
-
+                    if(text.length()>0) {
+                        int zip = Integer.parseInt(text);
+                        showList();
+                        updateMapForZip(zip);
+                    }
                     //hiding the keyboard
                     InputMethodManager imm = (InputMethodManager)getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromInputMethod(zipText.getWindowToken(),0);
 
-                    showList();
-                    updateMapForZip(zip);
+
                 }
 
                 return false;
@@ -140,8 +142,17 @@ public class MainFragment extends Fragment implements OnMapReadyCallback{
         try {
             List<Address> addresses = geocoder.getFromLocation( latLng.latitude,latLng.longitude,1);
             //removing the space in string .replaceAll("\\s+","")
-            int zip = Integer.parseInt(addresses.get(0).getPostalCode().replaceAll("\\s+",""));
-            updateMapForZip(zip);
+
+            String zipString = addresses.get(0).getPostalCode().replaceAll("\\s+","");
+
+            if(zipString!=null&&!zipString.isEmpty()) {
+                int zip = Integer.parseInt(zipString);
+                updateMapForZip(zip);
+            }else {
+                return;
+            }
+
+
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(getContext(),"zip error",Toast.LENGTH_SHORT).show();
